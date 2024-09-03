@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panier d'Achat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .cart {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .item img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+        .item-name {
+            flex: 1;
+        }
+        .quantity-controls, .item-actions {
+            margin-left: 10px;
+        }
+        .quantity-controls button, .item-actions button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 8px;
+            margin: 0 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .quantity-controls button:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+        }
+        .item-actions .heart {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .item-actions .heart.liked {
+            color: red;
+        }
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart">
+        <h1>Votre Panier</h1>
+        <div id="cart-items">
+            <!-- Les articles seront ajoutés ici dynamiquement -->
+        </div>
+        <div class="total-price">Total: <span id="total-price">0.00</span> €</div>
+    </div>
+
+    <script>
+        const cartItems = [
+            { id: 1, name: 'Article 1', price: 10.00, quantity: 1, imgSrc: 'https://via.placeholder.com/60' },
+            { id: 2, name: 'Article 2', price: 15.00, quantity: 1, imgSrc: 'https://via.placeholder.com/60' },
+        ];
+
+        function renderCart() {
+            const cartContainer = document.getElementById('cart-items');
+            cartContainer.innerHTML = '';
+
+            cartItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+
+                itemDiv.innerHTML = `
+                    <img src="${item.imgSrc}" alt="${item.name}">
+                    <div class="item-name">${item.name}</div>
+                    <div class="quantity-controls">
+                        <button onclick="changeQuantity(${item.id}, -1)" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="removeItem(${item.id})">Supprimer</button>
+                        <button class="heart" onclick="toggleLike(${item.id})">&#9825;</button>
+                    </div>
+                `;
+
+                cartContainer.appendChild(itemDiv);
+            });
+
+            updateTotalPrice();
+        }
+
+        function changeQuantity(itemId, delta) {
+            const item = cartItems.find(i => i.id === itemId);
+            if (item) {
+                item.quantity = Math.max(1, item.quantity + delta);
+                renderCart();
+            }
+        }
+
+        function removeItem(itemId) {
+            const itemIndex = cartItems.findIndex(i => i.id === itemId);
+            if (itemIndex !== -1) {
+                cartItems.splice(itemIndex, 1);
+                renderCart();
+            }
+        }
+
+        function toggleLike(itemId) {
+            const heartButton = document.querySelector(`.heart[onclick="toggleLike(${itemId})"]`);
+            heartButton.classList.toggle('liked');
+        }
+
+        function updateTotalPrice() {
+            const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        }
+
+        // Initial render
+        renderCart();
+    </script>
+</body>
+</html>
